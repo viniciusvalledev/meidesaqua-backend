@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### teste ####
+### essencial tirar ####
 /src/test/
-/src/resources/
+application-local.properties
