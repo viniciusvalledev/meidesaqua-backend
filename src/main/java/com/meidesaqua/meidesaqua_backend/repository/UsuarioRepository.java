@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    // Método customizado que o Spring Data JPA implementa automaticamente
+    //Metodo customizado que o Spring Data JPA implementa automaticamente
     Optional<Usuario> findByEmailOrUsername(String email, String username);
 }
