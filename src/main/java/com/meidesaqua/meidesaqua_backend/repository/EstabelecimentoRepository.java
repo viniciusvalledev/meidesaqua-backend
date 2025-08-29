@@ -1,0 +1,11 @@
+// Local: src/main/java/com/meidesaqua/meidesaquabackend/repository/EstabelecimentoRepository.java
+package com.meidesaqua.meidesaqua_backend.repository;
+
+import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface EstabelecimentoRepository extends JpaRepository<Estabelecimento, Integer> {
+    // Busca estabelecimentos cujo nome fantasia contenha o texto pesquisado, ignorando maiúsculas/minúsculas
+    List<Estabelecimento> findByNomeFantasiaContainingIgnoreCase(String nome);
+}
