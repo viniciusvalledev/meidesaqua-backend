@@ -31,16 +31,10 @@ public class EstabelecimentoService {
 
     // Metodo de cadastro
     public Estabelecimento cadastrarEstabelecimento(Estabelecimento estabelecimento) throws Exception {
-        // 1. Pega o CNPJ do estabelecimento que estamos tentando cadastrar
-        String cnpj = estabelecimento.getCnpj();
-
-        // 2. Verifica se o CNPJ não é nulo e se já existe no banco
-        if (cnpj != null && estabelecimentoRepository.findByCnpj(cnpj).isPresent()) {
-            // 3. Se existir, lança um erro com uma mensagem clara
+        // Verifica se o CNPJ já existe (lógica que adicionámos)
+        if (estabelecimento.getCnpj() != null && estabelecimentoRepository.findByCnpj(estabelecimento.getCnpj()).isPresent()) {
             throw new Exception("CNPJ já cadastrado no sistema.");
         }
-
-        // 4. Se não existir, salva o novo estabelecimento
         return estabelecimentoRepository.save(estabelecimento);
     }
 }
