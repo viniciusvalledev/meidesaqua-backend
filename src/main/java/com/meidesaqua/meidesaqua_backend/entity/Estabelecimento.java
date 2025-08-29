@@ -13,20 +13,25 @@ public class Estabelecimento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "estabelecimento_id")
     private Integer estabelecimentoId;
-
-    // Mapeamento direto das colunas para os atributos
     private String categoria;
-    private String contato_estabelecimento;
+    @Column(name = "contato_estabelecimento")
+    private String contatoEstabelecimento;
     private String cnpj;
-    private String nome_fantasia;
-    private String email_estabelecimento;
+    @Column(name = "nome_fantasia")
+    private String nomeFantasia;
+    @Column(name = "email_estabelecimento")
+    private String emailEstabelecimento;
     private String endereco;
     private String descricao;
-    private String descricao_diferencial;
+    @Column(name = "descricao_diferencial")
+    private String descricaoDiferencial;
     private String especialidade;
-    private String tags_invisiveis;
+    @Column(name = "tags_invisiveis")
+    private String tagsInvisiveis;
     private String coordenadas;
     private String website;
     private String instagram;
     private Boolean ativo;
+
+    // Mapeamento direto das colunas para os atributos
 }

@@ -13,11 +13,13 @@ public class Proprietario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "proprietario_id")
     private Integer proprietarioId;
-
-    private String nome_completo;
+    @Column(name = "nome_completo")
+    private String nomeCompleto;
     private String cpf;
-    private String contato_proprietario;
-    private String email_proprietario;
+    @Column(name = "contato_proprietario")
+    private String contatoProprietario;
+    @Column(name = "email_proprietario")
+    private String emailProprietario;
 
     @OneToOne
     @JoinColumn(name = "estabelecimento_id")

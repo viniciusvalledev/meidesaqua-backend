@@ -14,7 +14,7 @@ public class Usuario {
     @Column(name = "usuario_id")
     private Integer usuarioId;
 
-    @Column(name = "nome_completo", nullable = false)
+    @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
     // Garante que não haverá dois usuários com o mesmo username
