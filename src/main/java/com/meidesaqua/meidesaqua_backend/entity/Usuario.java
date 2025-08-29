@@ -1,13 +1,17 @@
-// Em src/main/java/com/meidesaqua/meidesaquabackend/entity/Usuario.java
 package com.meidesaqua.meidesaqua_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "usuarios")
 @Data
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,15 +21,30 @@ public class Usuario {
     @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
-    // Garante que não haverá dois usuários com o mesmo username
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    // Garante que não haverá dois usuários com o mesmo email
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "senha", nullable = false)
-    private String senha; // Esta será a senha CRIPTOGRAFADA
+    private String senha;
+
+    // MÉTODOS OBRIGATÓRIOS DO SPRING SECURITY (UserDetails)
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
 
 }
