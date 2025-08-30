@@ -6,6 +6,8 @@ import com.meidesaqua.meidesaqua_backend.repository.AvaliacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AvaliacaoService {
 
@@ -34,5 +36,9 @@ public class AvaliacaoService {
 
     public Double calcularMediaPorEstabelecimento(Integer estabelecimentoId) {
         return avaliacaoRepository.findAverageNotaByEstabelecimentoId(estabelecimentoId);
+    }
+    // Dentro da classe AvaliacaoService
+    public List<Avaliacao> listarPorEstabelecimento(Integer estabelecimentoId) {
+        return avaliacaoRepository.findByEstabelecimentoEstabelecimentoId(estabelecimentoId);
     }
 }

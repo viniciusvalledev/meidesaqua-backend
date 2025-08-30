@@ -2,6 +2,7 @@ package com.meidesaqua.meidesaqua_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +22,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Bean para o authentication manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -32,9 +32,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // Mantemos tudo permitido por enquanto para facilitar os testes
+                        // Rotas Públicas (não precisam de login)
+                        .requestMatchers("/api/auth/**").permitAll() // Cadastro e Login
+                        .requestMatchers(HttpMethod.GET, "/api/estabelecimentos/**").permitAll() // Todas as buscas de estabelecimentos
+                        .requestMatchers(HttpMethod.GET, "/api/proprietarios/**").permitAll() // Todas as buscas de proprietários
+
+                        // Rotas Protegidas (precisam de login)
+                        .anyRequest().authenticated() // Qualquer outra requisição (como POST em /api/avaliacoes) exige login
                 )
-                .httpBasic(withDefaults()); // Habilita a autenticação básica que o Postman usa
+                .httpBasic(withDefaults()); // Habilita a autenticação
         return http.build();
     }
 }
