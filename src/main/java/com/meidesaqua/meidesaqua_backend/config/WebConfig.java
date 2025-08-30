@@ -1,4 +1,3 @@
-// Local: src/main/java/com/meidesaqua/meidesaquabackend/config/WebConfig.java
 package com.meidesaqua.meidesaqua_backend.config;
 
 import org.springframework.context.annotation.Configuration;

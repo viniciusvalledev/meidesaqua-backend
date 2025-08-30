@@ -1,4 +1,3 @@
-// Local: src/main/java/com/meidesaqua/meidesaquabackend/repository/EstabelecimentoRepository.java
 package com.meidesaqua.meidesaqua_backend.repository;
 
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;

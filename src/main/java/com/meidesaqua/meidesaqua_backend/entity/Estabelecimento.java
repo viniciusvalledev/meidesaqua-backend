@@ -1,4 +1,3 @@
-// Local: src/main/java/com/meidesaqua/meidesaquabackend/entity/Estabelecimento.java
 package com.meidesaqua.meidesaqua_backend.entity;
 
 import jakarta.persistence.*;

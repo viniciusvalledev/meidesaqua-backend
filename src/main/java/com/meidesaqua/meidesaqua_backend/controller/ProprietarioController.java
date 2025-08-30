@@ -1,4 +1,3 @@
-// Local: src/main/java/com/meidesaqua/meidesaquabackend/controller/ProprietarioController.java
 package com.meidesaqua.meidesaqua_backend.controller;
 
 import com.meidesaqua.meidesaqua_backend.entity.Proprietario;

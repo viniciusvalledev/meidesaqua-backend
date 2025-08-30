@@ -30,7 +30,7 @@ public class Usuario implements UserDetails {
     @Column(name = "senha", nullable = false)
     private String senha;
 
-    // MÉTODOS OBRIGATÓRIOS DO SPRING SECURITY (UserDetails)
+    // Metodos obrigatorios do Spring Security (UserDetails)
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

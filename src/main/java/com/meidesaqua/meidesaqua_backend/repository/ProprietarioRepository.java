@@ -9,6 +9,6 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Inte
 
     List<Proprietario> findByNomeCompletoContainingIgnoreCase(String nome);
 
-    // --- NOVO MÉTODO PARA BUSCAR POR CPF ---
+    // Metodo para buscar cpf
     Optional<Proprietario> findByCpf(String cpf);
 }

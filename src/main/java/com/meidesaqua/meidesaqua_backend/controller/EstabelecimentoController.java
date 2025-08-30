@@ -15,7 +15,7 @@ public class EstabelecimentoController {
     @Autowired
     private EstabelecimentoService estabelecimentoService;
 
-    // --- NOVO ENDPOINT DE CADASTRO ---
+    // EndPoint de cadastro
     @PostMapping
     public ResponseEntity<?> cadastrarEstabelecimento(@RequestBody Estabelecimento estabelecimento) {
         try {

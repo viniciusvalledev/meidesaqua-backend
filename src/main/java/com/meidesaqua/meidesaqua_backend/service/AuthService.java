@@ -1,4 +1,3 @@
-// Local: src/main/java/com/meidesaqua/meidesaquabackend/service/AuthService.java
 package com.meidesaqua.meidesaqua_backend.service;
 
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
