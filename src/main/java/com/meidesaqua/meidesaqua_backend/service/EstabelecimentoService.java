@@ -36,4 +36,16 @@ public class EstabelecimentoService {
         }
         return estabelecimentoRepository.save(estabelecimento);
     }
+    // Metodo para ativar e desativar os MEIs
+    public Estabelecimento alterarStatusAtivo(Integer id, boolean novoStatus) throws Exception {
+        // 1. Procura o estabelecimento pelo ID
+        Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
+                .orElseThrow(() -> new Exception("Estabelecimento não encontrado com o ID: " + id));
+
+        // 2. Altera o status para o novo valor recebido
+        estabelecimento.setAtivo(novoStatus);
+
+        // 3. Salva o estabelecimento atualizado de volta na base de dados
+        return estabelecimentoRepository.save(estabelecimento);
+    }
 }

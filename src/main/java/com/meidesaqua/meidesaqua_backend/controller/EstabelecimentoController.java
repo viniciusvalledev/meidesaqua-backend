@@ -61,14 +61,32 @@ public class EstabelecimentoController {
         Double media = avaliacaoService.calcularMediaPorEstabelecimento(id);
 
         if (media == null) {
-            // Se a média for nula, cria uma resposta com uma mensagem
             Map<String, Object> response = new HashMap<>();
             response.put("media", 0.0);
             response.put("mensagem", "Este estabelecimento ainda não possui avaliações.");
             return ResponseEntity.ok(response);
         }
 
-        // Se houver média, retorna-a
         return ResponseEntity.ok(Map.of("media", media));
+    }
+
+    // Endpoint para ATIVAR ou DESATIVAR um estabelecimento
+    @PostMapping("/{id}/status")
+    public ResponseEntity<?> alterarStatus(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Boolean> statusMap) {
+        try {
+            Boolean novoStatus = statusMap.get("ativo");
+            if (novoStatus == null) {
+                return new ResponseEntity<>("O corpo da requisição deve conter a chave 'ativo' com um valor booleano (true/false).", HttpStatus.BAD_REQUEST);
+            }
+
+            Estabelecimento estabelecimentoAtualizado = estabelecimentoService.alterarStatusAtivo(id, novoStatus);
+            return ResponseEntity.ok(estabelecimentoAtualizado);
+
+        } catch (Exception e) {
+            // Retorna Not Found se o estabelecimento com o ID não existir
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 }
