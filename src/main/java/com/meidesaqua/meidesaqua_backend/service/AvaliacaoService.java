@@ -12,7 +12,7 @@ public class AvaliacaoService {
     @Autowired
     private AvaliacaoRepository avaliacaoRepository;
 
-    // O método agora recebe o utilizador logado como parâmetro
+    // O metodo agora recebe o utilizador logado como parâmetro
     public Avaliacao submeterAvaliacao(Avaliacao avaliacao, Usuario usuarioLogado) throws Exception {
         // Define o utilizador da avaliação como o que está logado
         avaliacao.setUsuario(usuarioLogado);
