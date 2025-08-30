@@ -1,28 +1,34 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
 import com.meidesaqua.meidesaqua_backend.entity.Avaliacao;
+import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AvaliacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/avaliacoes") // URL base para tudo relacionado a avaliações
+@RequestMapping("/api/avaliacoes")
 public class AvaliacaoController {
 
     @Autowired
     private AvaliacaoService avaliacaoService;
 
-    // Endpoint para um utilizador submeter uma nova avaliação
+    // Endpoint para um utilizador LOGADO submeter uma nova avaliação
     @PostMapping
-    public ResponseEntity<Avaliacao> submeterAvaliacao(@RequestBody Avaliacao avaliacao) {
+    public ResponseEntity<?> submeterAvaliacao(@RequestBody Avaliacao avaliacao, Authentication authentication) {
         try {
-            Avaliacao novaAvaliacao = avaliacaoService.submeterAvaliacao(avaliacao);
+            // Pega o objeto do utilizador que está autenticado
+            Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
+
+            // Chama o serviço, passando a avaliação e o utilizador logado
+            Avaliacao novaAvaliacao = avaliacaoService.submeterAvaliacao(avaliacao, usuarioLogado);
+
             return new ResponseEntity<>(novaAvaliacao, HttpStatus.CREATED);
         } catch (Exception e) {
-            // Em caso de erro (ex: utilizador ou estabelecimento não existem), retorna um erro genérico
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }
