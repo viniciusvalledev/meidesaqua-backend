@@ -3,6 +3,7 @@ package com.meidesaqua.meidesaqua_backend.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority; // CERTIFIQUE-SE QUE ESTE IMPORT EXISTE
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -34,7 +35,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        // AQUI ESTÁ A CORREÇÃO CRÍTICA
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -47,5 +49,25 @@ public class Usuario implements UserDetails {
         return this.username;
     }
 
+    // O Spring Security também requer estes métodos.
+    // Embora o Lombok @Data possa criá-los, é boa prática explicitá-los para maior clareza.
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
