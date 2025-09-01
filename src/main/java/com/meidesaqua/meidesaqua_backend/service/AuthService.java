@@ -19,7 +19,7 @@ public class AuthService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Metodo para verificarf o login
+    // Metodo para verificar o login
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // O Spring Security chama este metodo para encontrar um usuário pelo username
