@@ -2,20 +2,29 @@ package com.meidesaqua.meidesaqua_backend.controller;
 
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AuthService;
+import com.meidesaqua.meidesaqua_backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth") // URL base para autenticação
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
-    // Endpoint para CADASTRAR um novo utilizador
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
+
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
@@ -26,15 +35,17 @@ public class AuthController {
         }
     }
 
-    // Endpoint para LOGIN de um utilizador existente
     @PostMapping("/login")
-    public ResponseEntity<?> loginUsuario(Authentication authentication) {
-        // Se a requisição chegar até aqui, o Spring Security já validou o username e a senha.
-        // O objeto 'authentication' contém os detalhes do utilizador que foi autenticado com sucesso.
-        Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-
-        // Retorna os dados do utilizador logado como confirmação de sucesso.
-        return ResponseEntity.ok(usuarioLogado);
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
+            final UserDetails userDetails = authService.loadUserByUsername(loginRequest.getUsername());
+            final String token = jwtService.generateToken(userDetails);
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (Exception e) {
+            return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
+        }
     }
 }
-

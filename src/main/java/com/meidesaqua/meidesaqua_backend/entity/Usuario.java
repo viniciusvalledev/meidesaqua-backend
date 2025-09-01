@@ -47,4 +47,5 @@ public class Usuario implements UserDetails {
         return this.username;
     }
 
+
 }
