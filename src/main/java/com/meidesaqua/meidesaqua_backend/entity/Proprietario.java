@@ -13,7 +13,7 @@ public class Proprietario {
     @Column(name = "proprietario_id")
     private Integer proprietarioId;
     @Column(name = "nome_completo")
-    private String nomeCompletoP;
+    private String nomeCompleto;
     private String cpf;
     @Column(name = "contato_proprietario")
     private String contatoProprietario;

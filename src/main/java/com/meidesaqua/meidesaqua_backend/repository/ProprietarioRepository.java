@@ -7,7 +7,7 @@ import java.util.Optional; // Importe a classe Optional
 
 public interface ProprietarioRepository extends JpaRepository<Proprietario, Integer> {
 
-    List<Proprietario> findByNomeCompletoPContainingIgnoreCase(String nome);
+    List<Proprietario> findByNomeCompletoContainingIgnoreCase(String nome);
 
     // Metodo para buscar cpf
     Optional<Proprietario> findByCpf(String cpf);

@@ -18,7 +18,7 @@ public class Usuario implements UserDetails {
     @Column(name = "usuario_id")
     private Integer usuarioId;
 
-    @Column(name = "nome_completo_usuario", nullable = false)
+    @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
     @Column(name = "username", nullable = false, unique = true)
