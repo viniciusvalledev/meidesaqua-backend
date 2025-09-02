@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder; // Adicione este import
+import org.springframework.security.crypto.password.PasswordEncoder; // 1. ADICIONE ESTE IMPORT
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -26,14 +26,15 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    // Adicione a injeção do PasswordEncoder
+    // 2. INJETE O PASSWORDENCODER DIRETAMENTE NO CONTROLLER
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
-            Usuario usuarioSalvo = authService.cadastrarUsuario(usuario);
+            // 3. PASSE O PASSWORDENCODER COMO PARÂMETRO PARA O SERVIÇO
+            Usuario usuarioSalvo = authService.cadastrarUsuario(usuario, passwordEncoder);
             return new ResponseEntity<>(usuarioSalvo, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -51,28 +52,6 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
             return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    // ========= ENDPOINT DE DIAGNÓSTICO TEMPORÁRIO =========
-    @PostMapping("/test-password")
-    public ResponseEntity<?> testPassword(@RequestBody LoginRequest loginRequest) {
-        try {
-            UserDetails userDetails = authService.loadUserByUsername(loginRequest.getUsername());
-            String storedPasswordHash = userDetails.getPassword();
-            String rawPassword = loginRequest.getPassword();
-
-            boolean matches = passwordEncoder.matches(rawPassword, storedPasswordHash);
-
-            // Este JSON vai dizer-nos tudo o que precisamos de saber
-            return ResponseEntity.ok(Map.of(
-                    "username_found", userDetails.getUsername(),
-                    "raw_password_sent", rawPassword,
-                    "hash_from_db", storedPasswordHash,
-                    "passwords_match_result", matches
-            ));
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }
