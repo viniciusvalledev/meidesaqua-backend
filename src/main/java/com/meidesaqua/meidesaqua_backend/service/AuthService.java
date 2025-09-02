@@ -25,7 +25,7 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado: " + username));
     }
 
-    // ALTERE O MÉTODO PARA RECEBER O ENCODER COMO PARÂMETRO
+    // ALTERE O METODO PARA RECEBER O ENCODER COMO PARÂMETRO
     public Usuario cadastrarUsuario(Usuario usuario, PasswordEncoder passwordEncoder) throws Exception {
         if (usuarioRepository.findByEmailOrUsername(usuario.getEmail(), usuario.getUsername()).isPresent()) {
             throw new Exception("Email ou nome de utilizador já cadastrado.");
