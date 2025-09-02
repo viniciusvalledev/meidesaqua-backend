@@ -21,7 +21,8 @@ public class Usuario implements UserDetails {
     @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
-    @Column(name = "nome_user", nullable = false, unique = true)
+    // GARANTA QUE ESTE CAMPO ESTÁ CORRETO
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -40,6 +41,7 @@ public class Usuario implements UserDetails {
         return this.password;
     }
 
+    // Este metodo é usado pelo Spring Security e deve retornar o campo 'username'
     @Override
     public String getUsername() {
         return this.username;

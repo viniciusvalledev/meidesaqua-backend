@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder; // 1. ADICIONE ESTE IMPORT
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -26,14 +26,12 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    // 2. INJETE O PASSWORDENCODER DIRETAMENTE NO CONTROLLER
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
-            // 3. PASSE O PASSWORDENCODER COMO PARÂMETRO PARA O SERVIÇO
             Usuario usuarioSalvo = authService.cadastrarUsuario(usuario, passwordEncoder);
             return new ResponseEntity<>(usuarioSalvo, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -51,6 +49,7 @@ public class AuthController {
             final String token = jwtService.generateToken(userDetails);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
+            e.printStackTrace(); // Deixe esta linha para vermos o erro exato na consola
             return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
         }
     }
