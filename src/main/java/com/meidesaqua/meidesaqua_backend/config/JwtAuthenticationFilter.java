@@ -36,25 +36,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String username;
 
-        // 1. Verifica se o cabeçalho de autorização existe e começa com "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response); // Se não, continua para o próximo filtro
+            filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Extrai o token do cabeçalho
         jwt = authHeader.substring(7);
         username = jwtService.extractUsername(jwt);
 
-        // 3. Verifica se o token tem um username e se o utilizador ainda não está autenticado
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            // 4. Se o token for válido, autentica o utilizador para esta requisição
+
+            // ====================== DEBUG ======================
+            // VAMOS VERIFICAR AS PERMISSÕES QUE O SISTEMA ENCONTROU
+            System.out.println(">>> Utilizador: " + userDetails.getUsername());
+            System.out.println(">>> Permissões encontradas: " + userDetails.getAuthorities());
+            // ===================================================
+
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
+                        userDetails.getAuthorities() // As permissões são passadas aqui
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

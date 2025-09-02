@@ -20,6 +20,8 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Quando o login é tentado, este metodo é chamado.
+        System.out.println(">>> [AuthService] Procurando utilizador: " + username);
         return usuarioRepository.findByEmailOrUsername(username, username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado: " + username));
     }
@@ -28,8 +30,15 @@ public class AuthService implements UserDetailsService {
         if (usuarioRepository.findByEmailOrUsername(usuario.getEmail(), usuario.getUsername()).isPresent()) {
             throw new Exception("Email ou nome de utilizador já cadastrado.");
         }
-        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
-        usuario.setSenha(senhaCriptografada);
+
+        // ====================== DEBUG ======================
+        System.out.println(">>> [AuthService] Senha recebida para cadastro: " + usuario.getPassword());
+        String senhaCriptografada = passwordEncoder.encode(usuario.getPassword());
+        System.out.println(">>> [AuthService] Senha APÓS criptografia: " + senhaCriptografada);
+        // ===================================================
+
+        usuario.setPassword(senhaCriptografada);
+
         return usuarioRepository.save(usuario);
     }
 }

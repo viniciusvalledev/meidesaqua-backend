@@ -2,6 +2,7 @@ package com.meidesaqua.meidesaqua_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -22,13 +25,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
+                .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Permite acesso aos endpoints de login e cadastro
+                        // Libera os endpoints de autenticação
                         .requestMatchers("/api/auth/**").permitAll()
-                        // ALTERAÇÃO CRÍTICA AQUI:
-                        // Exige que qualquer outra requisição tenha a permissão 'USER'
-                        .anyRequest().hasRole("USER")
+
+                        // Libera o acesso de LEITURA (GET) para todos
+                        .requestMatchers(HttpMethod.GET).permitAll()
+
+                        // ALTERAÇÃO: Libera o acesso de ESCRITA (POST) para todos
+                        .requestMatchers(HttpMethod.POST).permitAll()
+
+                        // Exige autenticação para qualquer outra requisição (PUT, DELETE, etc.)
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -44,6 +54,8 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
+
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

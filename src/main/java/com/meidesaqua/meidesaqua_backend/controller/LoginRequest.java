@@ -1,4 +1,4 @@
-package com.meidesaqua.meidesaqua_backend.controller; // Verifique se o nome do seu pacote está correto
+package com.meidesaqua.meidesaqua_backend.controller;
 
 import lombok.Data;
 
