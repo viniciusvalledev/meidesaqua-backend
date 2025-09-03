@@ -1,9 +1,11 @@
 package com.meidesaqua.meidesaqua_backend.service;
 
+import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO; // ADICIONE ESTE IMPORT
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.repository.EstabelecimentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,10 @@ public class EstabelecimentoService {
 
     @Autowired
     private EstabelecimentoRepository estabelecimentoRepository;
+
+    // 1. INJETE O AVALIACAOSERVICE PARA PODERMOS USÁ-LO
+    @Autowired
+    private AvaliacaoService avaliacaoService;
 
     // Metodo para buscar todos os estabelecimentos da base de dados
     public List<Estabelecimento> listarTodos() {
@@ -30,22 +36,45 @@ public class EstabelecimentoService {
 
     // Metodo de cadastro
     public Estabelecimento cadastrarEstabelecimento(Estabelecimento estabelecimento) throws Exception {
-        // Verifica se o CNPJ já existe (lógica que adicionámos)
         if (estabelecimento.getCnpj() != null && estabelecimentoRepository.findByCnpj(estabelecimento.getCnpj()).isPresent()) {
             throw new Exception("CNPJ já cadastrado no sistema.");
         }
         return estabelecimentoRepository.save(estabelecimento);
     }
+
     // Metodo para ativar e desativar os MEIs
     public Estabelecimento alterarStatusAtivo(Integer id, boolean novoStatus) throws Exception {
-        // 1. Procura o estabelecimento pelo ID
         Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
                 .orElseThrow(() -> new Exception("Estabelecimento não encontrado com o ID: " + id));
 
-        // 2. Altera o status para o novo valor recebido
         estabelecimento.setAtivo(novoStatus);
-
-        // 3. Salva o estabelecimento atualizado de volta na base de dados
         return estabelecimentoRepository.save(estabelecimento);
+    }
+
+    // 2. METODO DE CONVERSÃO PARA O DTO
+    /**
+     * Converte uma entidade Estabelecimento para um EstabelecimentoDTO,
+     * calculando e incluindo a média das avaliações.
+     */
+    public EstabelecimentoDTO convertToDto(Estabelecimento estabelecimento) {
+        EstabelecimentoDTO dto = new EstabelecimentoDTO();
+
+        // Mapeia os campos da entidade para o DTO
+        dto.setEstabelecimentoId(estabelecimento.getEstabelecimentoId());
+        dto.setCategoria(estabelecimento.getCategoria());
+        dto.setContatoEstabelecimento(estabelecimento.getContatoEstabelecimento());
+        dto.setNomeFantasia(estabelecimento.getNomeFantasia());
+        dto.setEmailEstabelecimento(estabelecimento.getEmailEstabelecimento());
+        dto.setEndereco(estabelecimento.getEndereco());
+        dto.setDescricao(estabelecimento.getDescricao());
+        dto.setWebsite(estabelecimento.getWebsite());
+        dto.setInstagram(estabelecimento.getInstagram());
+        dto.setAtivo(estabelecimento.getAtivo());
+
+        // Calcula e define a média das avaliações
+        Double media = avaliacaoService.calcularMediaPorEstabelecimento(estabelecimento.getEstabelecimentoId());
+        dto.setMedia(media != null ? media : 0.0); // Se não houver avaliações, a média é 0.0
+
+        return dto;
     }
 }

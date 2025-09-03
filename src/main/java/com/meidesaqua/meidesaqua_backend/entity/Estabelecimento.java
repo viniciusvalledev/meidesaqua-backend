@@ -31,6 +31,5 @@ public class Estabelecimento {
     private String website;
     private String instagram;
     private Boolean ativo;
-
     // Mapeamento direto das colunas para os atributos
 }

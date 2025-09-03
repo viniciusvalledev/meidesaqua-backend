@@ -28,17 +28,13 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Libera os endpoints de autenticação
+                        // 1. Libera os endpoints de autenticação (login e cadastro)
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Libera o acesso de LEITURA (GET) para todos
                         .requestMatchers(HttpMethod.GET).permitAll()
 
-                        // ALTERAÇÃO: Libera o acesso de ESCRITA (POST) para todos
-                        .requestMatchers(HttpMethod.POST).permitAll()
-
-                        // Exige autenticação para qualquer outra requisição (PUT, DELETE, etc.)
-                        .anyRequest().authenticated()
+                        // 3. LIBERA todas as outras requisições (POST, PUT, DELETE, etc.)
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -54,8 +50,6 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
-
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
