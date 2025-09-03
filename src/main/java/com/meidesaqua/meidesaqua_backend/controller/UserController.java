@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users") // Novo URL base para gestão de utilizadores
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -18,11 +18,9 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Endpoint: PUT /api/users/profile
     @PutMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody UpdateProfileRequest profileRequest, Authentication authentication) {
         try {
-            // O 'authentication.getName()' pega o username do utilizador logado a partir do token JWT
             Usuario updatedUser = authService.updateUserProfile(authentication.getName(), profileRequest);
             return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
@@ -30,12 +28,22 @@ public class UserController {
         }
     }
 
-    // Endpoint: PUT /api/users/password
     @PutMapping("/password")
     public ResponseEntity<?> updateUserPassword(@RequestBody UpdatePasswordRequest passwordRequest, Authentication authentication) {
         try {
             authService.updateUserPassword(authentication.getName(), passwordRequest, passwordEncoder);
             return ResponseEntity.ok("Senha alterada com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // NOVO ENDPOINT: DELETAR PERFIL
+    @DeleteMapping("/profile")
+    public ResponseEntity<?> deleteUserProfile(Authentication authentication) {
+        try {
+            authService.deleteUser(authentication.getName());
+            return ResponseEntity.ok("Utilizador deletado com sucesso.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

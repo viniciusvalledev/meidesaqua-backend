@@ -49,8 +49,27 @@ public class AuthController {
             final String token = jwtService.generateToken(userDetails);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
-            e.printStackTrace(); // Deixe esta linha para vermos o erro exato na consola
             return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    // NOVO ENDPOINT: SOLICITAR REDEFINIÇÃO DE SENHA
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        authService.createPasswordResetTokenForUser(body.get("email"));
+        return ResponseEntity.ok(Map.of("message", "Se o e-mail estiver cadastrado, um link de redefinição será enviado."));
+    }
+
+    // NOVO ENDPOINT: REDEFINIR A SENHA
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            String newPassword = body.get("newPassword");
+            authService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Senha redefinida com sucesso."));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }
