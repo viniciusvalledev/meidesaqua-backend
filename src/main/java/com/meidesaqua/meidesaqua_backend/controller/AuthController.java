@@ -1,5 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
+import com.meidesaqua.meidesaqua_backend.DTO.LoginResponseDTO; // IMPORTAR O NOVO DTO
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AuthService;
 import com.meidesaqua.meidesaqua_backend.service.JwtService;
@@ -11,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,31 +45,17 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
-            final UserDetails userDetails = authService.loadUserByUsername(loginRequest.getUsername());
-            final String token = jwtService.generateToken(userDetails);
-            return ResponseEntity.ok(Map.of("token", token));
+
+            // Busca o objeto Usuario completo para ter acesso a todos os campos
+            final Usuario usuario = (Usuario) authService.loadUserByUsername(loginRequest.getUsername());
+            final String token = jwtService.generateToken(usuario);
+
+            // Cria e retorna o DTO de resposta com o token e os dados do usuário
+            return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
+
         } catch (Exception e) {
+            e.printStackTrace(); // Deixe esta linha para vermos o erro exato na consola
             return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    // NOVO ENDPOINT: SOLICITAR REDEFINIÇÃO DE SENHA
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
-        authService.createPasswordResetTokenForUser(body.get("email"));
-        return ResponseEntity.ok(Map.of("message", "Se o e-mail estiver cadastrado, um link de redefinição será enviado."));
-    }
-
-    // NOVO ENDPOINT: REDEFINIR A SENHA
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
-        try {
-            String token = body.get("token");
-            String newPassword = body.get("newPassword");
-            authService.resetPassword(token, newPassword);
-            return ResponseEntity.ok(Map.of("message", "Senha redefinida com sucesso."));
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -28,13 +28,15 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Libera os endpoints de autenticação (login e cadastro)
+                        // 1. Libera os endpoints de autenticação (login e cadastro) para todos
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET).permitAll()
+                        // 2. Libera a visualização (GET) de estabelecimentos para todos
+                        .requestMatchers(HttpMethod.GET, "/api/estabelecimentos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/avaliacoes/estabelecimento/**").permitAll()
 
-                        // 3. LIBERA todas as outras requisições (POST, PUT, DELETE, etc.)
-                        .anyRequest().permitAll()
+                        // 3. EXIGE AUTENTICAÇÃO para qualquer outra requisição
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
