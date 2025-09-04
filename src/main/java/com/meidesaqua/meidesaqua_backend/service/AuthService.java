@@ -72,9 +72,9 @@ public class AuthService implements UserDetailsService {
         usuarioRepository.save(currentUser);
     }
 
-    // NOVO MÉTODO: ATUALIZAR AVATAR
+    // NOVO METODO: ATUALIZAR AVATAR
     public Usuario updateUserAvatar(String currentUsername, String avatarFileName) throws Exception {
-        // Reutiliza o método loadUserByUsername para encontrar o usuário e já faz o cast para a entidade Usuario
+        // Reutiliza o metodo loadUserByUsername para encontrar o usuário e já faz o cast para a entidade Usuario
         Usuario currentUser = (Usuario) this.loadUserByUsername(currentUsername);
 
         // Define o nome do arquivo do avatar escolhido
