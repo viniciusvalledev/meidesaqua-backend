@@ -1,6 +1,7 @@
 package com.meidesaqua.meidesaqua_backend.repository;
 
 import com.meidesaqua.meidesaqua_backend.entity.Avaliacao;
+import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
