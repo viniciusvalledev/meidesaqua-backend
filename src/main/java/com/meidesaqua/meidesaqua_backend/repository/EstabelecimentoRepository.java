@@ -10,4 +10,5 @@ public interface EstabelecimentoRepository extends JpaRepository<Estabelecimento
     List<Estabelecimento> findByNomeFantasiaContainingIgnoreCase(String nome);
 
     Optional<Estabelecimento> findByCnpj(String cnpj);
+    Optional<Estabelecimento> findByNomeFantasia(String nomeFantasia);
 }

@@ -1,5 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
+import com.meidesaqua.meidesaqua_backend.DTO.AvaliacaoDTO; // IMPORTAR O DTO
 import com.meidesaqua.meidesaqua_backend.entity.Avaliacao;
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AvaliacaoService;
@@ -18,27 +19,24 @@ public class AvaliacaoController {
     @Autowired
     private AvaliacaoService avaliacaoService;
 
-    // Endpoint para um UTILIZADOR LOGADO submeter uma nova avaliação
+    // (o metodo submeterAvaliacao não precisa de alteração)
     @PostMapping
     public ResponseEntity<?> submeterAvaliacao(@RequestBody Avaliacao avaliacao, Authentication authentication) {
         try {
-            // Pega o objeto do utilizador que está autenticado na sessão
             Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-
-            // Chama o serviço, passando a avaliação e o utilizador logado
             Avaliacao novaAvaliacao = avaliacaoService.submeterAvaliacao(avaliacao, usuarioLogado);
-
             return new ResponseEntity<>(novaAvaliacao, HttpStatus.CREATED);
         } catch (Exception e) {
-            // Retorna a mensagem de erro específica do serviço (ex: "Utilizador já avaliou")
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
+
     // Endpoint para LISTAR TODAS as avaliações de um estabelecimento específico
+    // ALTERAÇÃO: Agora retorna uma lista de AvaliacaoDTO
     @GetMapping("/estabelecimento/{id}")
-    public ResponseEntity<List<Avaliacao>> listarPorEstabelecimento(@PathVariable Integer id) {
-        List<Avaliacao> avaliacoes = avaliacaoService.listarPorEstabelecimento(id);
-        return ResponseEntity.ok(avaliacoes);
+    public ResponseEntity<List<AvaliacaoDTO>> listarPorEstabelecimento(@PathVariable Integer id) {
+        List<AvaliacaoDTO> avaliacoesDTO = avaliacaoService.listarPorEstabelecimentoDTO(id);
+        return ResponseEntity.ok(avaliacoesDTO);
     }
 }

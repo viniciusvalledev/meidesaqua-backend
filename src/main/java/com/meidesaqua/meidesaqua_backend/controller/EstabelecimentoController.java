@@ -1,9 +1,14 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
-import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO; // ADICIONE ESTE IMPORT
+import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.service.AvaliacaoService;
 import com.meidesaqua.meidesaqua_backend.service.EstabelecimentoService;
+
+// IMPORTS PARA LOG
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +17,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors; // ADICIONE ESTE IMPORT
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/estabelecimentos")
 public class EstabelecimentoController {
+
+    // ADICIONAR UM LOGGER PARA DEPURAR
+    private static final Logger logger = LoggerFactory.getLogger(EstabelecimentoController.class);
 
     @Autowired
     private EstabelecimentoService estabelecimentoService;
@@ -34,7 +43,6 @@ public class EstabelecimentoController {
         }
     }
 
-    //retorna uma lista de DTOs
     @GetMapping("/buscar")
     public ResponseEntity<List<EstabelecimentoDTO>> buscarPorNome(@RequestParam String nome) {
         List<Estabelecimento> estabelecimentos = estabelecimentoService.buscarPorNome(nome);
@@ -44,7 +52,6 @@ public class EstabelecimentoController {
         return ResponseEntity.ok(dtos);
     }
 
-    //Agora retorna uma lista de DTOs
     @GetMapping
     public ResponseEntity<List<EstabelecimentoDTO>> listarTodos() {
         List<Estabelecimento> estabelecimentos = estabelecimentoService.listarTodos();
@@ -54,16 +61,33 @@ public class EstabelecimentoController {
         return ResponseEntity.ok(dtos);
     }
 
-    // Agora retorna um único DTO
+    // MÉTODO MODIFICADO PARA DEPURAR O ERRO 500
     @GetMapping("/{id}")
     public ResponseEntity<EstabelecimentoDTO> buscarPorId(@PathVariable Integer id) {
-        return estabelecimentoService.buscarPorId(id)
-                .map(estabelecimentoService::convertToDto) // Converte a entidade para DTO
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        logger.info(">>> Buscando estabelecimento com ID: {}", id);
+        try {
+            Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoService.buscarPorId(id);
+
+            if (estabelecimentoOpt.isEmpty()) {
+                logger.warn(">>> Estabelecimento com ID: {} não encontrado.", id);
+                return ResponseEntity.notFound().build();
+            }
+
+            Estabelecimento estabelecimento = estabelecimentoOpt.get();
+            logger.info(">>> Estabelecimento encontrado: {}", estabelecimento.getNomeFantasia());
+
+            EstabelecimentoDTO dto = estabelecimentoService.convertToDto(estabelecimento);
+            logger.info(">>> DTO convertido com sucesso para o estabelecimento ID: {}", id);
+
+            return ResponseEntity.ok(dto);
+
+        } catch (Exception e) {
+            // SE ALGO FALHAR, ESTE BLOCO VAI CAPTURAR E IMPRIMIR O ERRO COMPLETO
+            logger.error("!!!!!! ERRO GRAVE AO PROCESSAR ESTABELECIMENTO ID: {} !!!!!!", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // Este endpoint para fazer a media por ID do estabelecimento
     @GetMapping("/{id}/media")
     public ResponseEntity<Map<String, Object>> getMediaAvaliacoes(@PathVariable Integer id) {
         Double media = avaliacaoService.calcularMediaPorEstabelecimento(id);

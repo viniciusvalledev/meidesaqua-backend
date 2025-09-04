@@ -1,5 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.service;
 
+import com.meidesaqua.meidesaqua_backend.DTO.AvaliacaoDTO; // IMPORTAR O NOVO DTO
 import com.meidesaqua.meidesaqua_backend.entity.Avaliacao;
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.repository.AvaliacaoRepository;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors; // IMPORTAR STREAMS
 
 @Service
 public class AvaliacaoService {
@@ -14,7 +16,8 @@ public class AvaliacaoService {
     @Autowired
     private AvaliacaoRepository avaliacaoRepository;
 
-    // O metodo agora recebe o utilizador logado como parâmetro
+    // (metodo submeterAvaliacao e calcularMediaPorEstabelecimento permanecem iguais)
+
     public Avaliacao submeterAvaliacao(Avaliacao avaliacao, Usuario usuarioLogado) throws Exception {
         // Define o utilizador da avaliação como o que está logado
         avaliacao.setUsuario(usuarioLogado);
@@ -37,8 +40,20 @@ public class AvaliacaoService {
     public Double calcularMediaPorEstabelecimento(Integer estabelecimentoId) {
         return avaliacaoRepository.findAverageNotaByEstabelecimentoId(estabelecimentoId);
     }
-    // Dentro da classe AvaliacaoService
+
+
+    // METODO ANTIGO (ainda pode ser útil internamente)
     public List<Avaliacao> listarPorEstabelecimento(Integer estabelecimentoId) {
         return avaliacaoRepository.findByEstabelecimentoEstabelecimentoId(estabelecimentoId);
+    }
+
+    // NOVO METODO: Retorna uma lista de DTOs para a API
+    public List<AvaliacaoDTO> listarPorEstabelecimentoDTO(Integer estabelecimentoId) {
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoEstabelecimentoId(estabelecimentoId);
+
+        // Converte cada Avaliacao da lista para um AvaliacaoDTO
+        return avaliacoes.stream()
+                .map(AvaliacaoDTO::new)
+                .collect(Collectors.toList());
     }
 }

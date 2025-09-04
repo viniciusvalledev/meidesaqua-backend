@@ -50,6 +50,9 @@ public class EstabelecimentoService {
         estabelecimento.setAtivo(novoStatus);
         return estabelecimentoRepository.save(estabelecimento);
     }
+    public Optional<Estabelecimento> buscarPorNomeFantasia(String nome) {
+        return estabelecimentoRepository.findByNomeFantasia(nome);
+    }
 
     // 2. METODO DE CONVERSÃO PARA O DTO
     /**
