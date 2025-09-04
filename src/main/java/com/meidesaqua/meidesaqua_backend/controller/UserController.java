@@ -1,6 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
-import com.meidesaqua.meidesaqua_backend.DTO.UserDTO; // IMPORTAR DTO
+import com.meidesaqua.meidesaqua_backend.DTO.UserDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users") // Novo URL base para gestão de utilizadores
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class UserController {
         }
     }
 
-    // NOVO ENDPOINT PARA ATUALIZAR O AVATAR
+    // Endpoint para atualizar o avatar
     @PutMapping("/avatar")
     public ResponseEntity<?> updateUserAvatar(@RequestBody UpdateAvatarRequest avatarRequest, Authentication authentication) {
         try {
@@ -54,6 +54,19 @@ public class UserController {
 
             // Retorna o usuário atualizado (convertido para DTO para segurança)
             return ResponseEntity.ok(new UserDTO(updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // NOVO ENDPOINT PARA EXCLUSÃO DE PERFIL
+    @DeleteMapping("/profile")
+    public ResponseEntity<?> deleteUserProfile(Authentication authentication) {
+        try {
+            // Pega o nome de utilizador a partir do token de autenticação
+            String username = authentication.getName();
+            authService.deleteUser(username);
+            return ResponseEntity.ok("Perfil de utilizador excluído com sucesso.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

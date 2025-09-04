@@ -18,4 +18,7 @@ public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Integer> {
 
     // Dentro da interface AvaliacaoRepository
     List<Avaliacao> findByEstabelecimentoEstabelecimentoId(Integer estabelecimentoId);
+
+    // METODO PARA EXCLUIR TODAS AS AVALIAÇÕES DE UM UTILIZADOR
+    void deleteByUsuario(Usuario usuario);
 }
