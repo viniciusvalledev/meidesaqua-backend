@@ -67,6 +67,7 @@ public class EstabelecimentoService {
         dto.setEmailEstabelecimento(estabelecimento.getEmailEstabelecimento());
         dto.setEndereco(estabelecimento.getEndereco());
         dto.setDescricao(estabelecimento.getDescricao());
+        dto.setDescricaoDiferencial(estabelecimento.getDescricaoDiferencial());
         dto.setWebsite(estabelecimento.getWebsite());
         dto.setInstagram(estabelecimento.getInstagram());
         dto.setAtivo(estabelecimento.getAtivo());

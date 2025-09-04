@@ -11,6 +11,7 @@ public class EstabelecimentoDTO {
     private String emailEstabelecimento;
     private String endereco;
     private String descricao;
+    private String descricaoDiferencial;
     private String website;
     private String instagram;
     private Boolean ativo;
