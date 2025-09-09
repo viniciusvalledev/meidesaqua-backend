@@ -35,7 +35,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/estabelecimentos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/avaliacoes/estabelecimento/**").permitAll()
 
-                        // 3. EXIGE AUTENTICAÇÃO para qualquer outra requisição
+                        // 3. CORREÇÃO: Permite que usuários autenticados façam POST em /api/avaliacoes
+                        .requestMatchers(HttpMethod.POST, "/api/avaliacoes").authenticated()
+
+                        // 4. EXIGE AUTENTICAÇÃO para qualquer outra requisição
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
