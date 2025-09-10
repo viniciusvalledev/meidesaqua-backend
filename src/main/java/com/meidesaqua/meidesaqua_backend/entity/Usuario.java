@@ -37,6 +37,12 @@ public class Usuario implements UserDetails {
     @Column(name = "reset_password_token")
     private String resetPasswordToken;
 
+    @Column(name = "confirmation_token")
+    private String confirmationToken;
+
+    @Column(name = "enabled")
+    private boolean enabled = false; // Por padrão, a conta é criada como inativa
+
     @Column(name = "reset_password_token_expiry")
     private LocalDateTime resetPasswordTokenExpiry;
 

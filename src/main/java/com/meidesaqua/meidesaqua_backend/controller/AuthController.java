@@ -1,6 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
-import com.meidesaqua.meidesaqua_backend.DTO.LoginResponseDTO; // IMPORTAR O NOVO DTO
+import com.meidesaqua.meidesaqua_backend.DTO.LoginResponseDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Usuario;
 import com.meidesaqua.meidesaqua_backend.service.AuthService;
 import com.meidesaqua.meidesaqua_backend.service.JwtService;
@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,8 +35,8 @@ public class AuthController {
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
-            Usuario usuarioSalvo = authService.cadastrarUsuario(usuario, passwordEncoder);
-            return new ResponseEntity<>(usuarioSalvo, HttpStatus.CREATED);
+            authService.cadastrarUsuario(usuario, passwordEncoder);
+            return new ResponseEntity<>("Cadastro realizado com sucesso! Por favor, verifique seu e-mail para ativar sua conta.", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -46,16 +49,50 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
 
-            // Busca o objeto Usuario completo para ter acesso a todos os campos
             final Usuario usuario = (Usuario) authService.loadUserByUsername(loginRequest.getUsername());
             final String token = jwtService.generateToken(usuario);
 
-            // Cria e retorna o DTO de resposta com o token e os dados do usuário
             return ResponseEntity.ok(new LoginResponseDTO(token, usuario));
 
+        } catch (DisabledException e) {
+            return new ResponseEntity<>("Conta não ativada. Por favor, verifique seu e-mail de confirmação.", HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            e.printStackTrace(); // Deixe esta linha para vermos o erro exato na consola
+            e.printStackTrace();
             return new ResponseEntity<>("Utilizador ou senha inválidos.", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/confirm-account")
+    public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String token) {
+        try {
+            authService.confirmUserAccount(token);
+            // Idealmente, esta resposta redirecionaria para uma página do frontend
+            return ResponseEntity.ok("Conta ativada com sucesso. Você já pode fazer login.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            authService.forgotPassword(email);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Se existir uma conta com o e-mail fornecido, um link de redefinição de senha foi enviado."));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "Se existir uma conta com o e-mail fornecido, um link de redefinição de senha foi enviado."));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("token");
+            String newPassword = request.get("newPassword");
+            authService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Senha redefinida com sucesso."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
