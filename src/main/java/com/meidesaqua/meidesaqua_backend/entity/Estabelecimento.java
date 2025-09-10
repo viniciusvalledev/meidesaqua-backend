@@ -31,5 +31,10 @@ public class Estabelecimento {
     private String website;
     private String instagram;
     private Boolean ativo;
+    @Column(name = "logoUrl", columnDefinition = "TEXT")
+    private String logoUrl;
+    @Column(name = "produtosImg", columnDefinition = "TEXT")
+    private String produtosImg;
+
     // Mapeamento direto das colunas para os atributos
 }

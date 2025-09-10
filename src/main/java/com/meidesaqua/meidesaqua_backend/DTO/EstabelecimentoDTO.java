@@ -15,5 +15,7 @@ public class EstabelecimentoDTO {
     private String website;
     private String instagram;
     private Boolean ativo;
+    private String logoUrl;
+    private String produtosImg;
     private Double media; // A média será um número (Double)
 }

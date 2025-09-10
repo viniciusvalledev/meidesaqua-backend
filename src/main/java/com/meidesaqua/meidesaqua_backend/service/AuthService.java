@@ -59,6 +59,8 @@ public class AuthService implements UserDetailsService {
 
         emailService.sendConfirmationEmail(usuarioSalvo.getEmail(), usuarioSalvo.getConfirmationToken());
 
+        System.out.println("TOKEN DE CONFIRMAÇÃO: " + usuarioSalvo.getConfirmationToken());
+
         return usuarioSalvo;
     }
 
@@ -116,16 +118,6 @@ public class AuthService implements UserDetailsService {
         return usuarioRepository.save(currentUser);
     }
 
-    public void updateUserPassword(String currentUsername, UpdatePasswordRequest data, PasswordEncoder passwordEncoder) throws Exception {
-        Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
-                .orElseThrow(() -> new Exception("Utilizador não encontrado."));
-        if (!passwordEncoder.matches(data.getCurrentPassword(), currentUser.getPassword())) {
-            throw new Exception("A senha atual está incorreta.");
-        }
-        String novaSenhaCriptografada = passwordEncoder.encode(data.getNewPassword());
-        currentUser.setPassword(novaSenhaCriptografada);
-        usuarioRepository.save(currentUser);
-    }
 
     public Usuario updateUserAvatar(String currentUsername, String avatarFileName) throws Exception {
         Usuario currentUser = (Usuario) this.loadUserByUsername(currentUsername);

@@ -16,11 +16,12 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // O PasswordEncoder foi removido pois não é mais usado neste controller
+    // @Autowired
+    // private PasswordEncoder passwordEncoder;
 
     // Endpoint: PUT /api/users/profile
-    @PutMapping("/profile")
+    @PostMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody UpdateProfileRequest profileRequest, Authentication authentication) {
         try {
             // O 'authentication.getName()' pega o username do utilizador logado a partir do token JWT
@@ -31,33 +32,7 @@ public class UserController {
         }
     }
 
-    // Endpoint: PUT /api/users/password
-    @PutMapping("/password")
-    public ResponseEntity<?> updateUserPassword(@RequestBody UpdatePasswordRequest passwordRequest, Authentication authentication) {
-        try {
-            authService.updateUserPassword(authentication.getName(), passwordRequest, passwordEncoder);
-            return ResponseEntity.ok("Senha alterada com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
-    // Endpoint para atualizar o avatar
-    @PutMapping("/avatar")
-    public ResponseEntity<?> updateUserAvatar(@RequestBody UpdateAvatarRequest avatarRequest, Authentication authentication) {
-        try {
-            // Pega o username do usuário logado a partir do token
-            String username = authentication.getName();
-
-            // Chama o serviço para atualizar o avatar no banco de dados
-            Usuario updatedUser = authService.updateUserAvatar(username, avatarRequest.getAvatar());
-
-            // Retorna o usuário atualizado (convertido para DTO para segurança)
-            return ResponseEntity.ok(new UserDTO(updatedUser));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     // NOVO ENDPOINT PARA EXCLUSÃO DE PERFIL
     @DeleteMapping("/profile")

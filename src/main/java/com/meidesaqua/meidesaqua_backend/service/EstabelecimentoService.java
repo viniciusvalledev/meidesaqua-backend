@@ -1,6 +1,6 @@
 package com.meidesaqua.meidesaqua_backend.service;
 
-import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO; // ADICIONE ESTE IMPORT
+import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.repository.EstabelecimentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EstabelecimentoService {
@@ -15,7 +16,6 @@ public class EstabelecimentoService {
     @Autowired
     private EstabelecimentoRepository estabelecimentoRepository;
 
-    // 1. INJETE O AVALIACAOSERVICE PARA PODERMOS USÁ-LO
     @Autowired
     private AvaliacaoService avaliacaoService;
 
@@ -39,6 +39,7 @@ public class EstabelecimentoService {
         if (estabelecimento.getCnpj() != null && estabelecimentoRepository.findByCnpj(estabelecimento.getCnpj()).isPresent()) {
             throw new Exception("CNPJ já cadastrado no sistema.");
         }
+        // Este metodo já salva o objeto completo, incluindo os novos campos de imagem
         return estabelecimentoRepository.save(estabelecimento);
     }
 
@@ -50,14 +51,14 @@ public class EstabelecimentoService {
         estabelecimento.setAtivo(novoStatus);
         return estabelecimentoRepository.save(estabelecimento);
     }
+
     public Optional<Estabelecimento> buscarPorNomeFantasia(String nome) {
         return estabelecimentoRepository.findByNomeFantasia(nome);
     }
 
-    // 2. METODO DE CONVERSÃO PARA O DTO
     /**
      * Converte uma entidade Estabelecimento para um EstabelecimentoDTO,
-     * calculando e incluindo a média das avaliações.
+     * calculando e incluindo a média das avaliações e os dados das imagens.
      */
     public EstabelecimentoDTO convertToDto(Estabelecimento estabelecimento) {
         EstabelecimentoDTO dto = new EstabelecimentoDTO();
@@ -74,6 +75,10 @@ public class EstabelecimentoService {
         dto.setWebsite(estabelecimento.getWebsite());
         dto.setInstagram(estabelecimento.getInstagram());
         dto.setAtivo(estabelecimento.getAtivo());
+
+        // Mapeia os novos campos de imagem
+        dto.setLogoUrl(estabelecimento.getLogoUrl());
+        dto.setProdutosImg(estabelecimento.getProdutosImg());
 
         // Calcula e define a média das avaliações
         Double media = avaliacaoService.calcularMediaPorEstabelecimento(estabelecimento.getEstabelecimentoId());
