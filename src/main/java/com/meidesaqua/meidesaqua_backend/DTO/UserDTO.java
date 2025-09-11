@@ -9,13 +9,13 @@ public class UserDTO {
     private String username;
     private String email;
     private String nomeCompleto;
-    private String chosenAvatar;
+    // CAMPO REMOVIDO
+    // private String chosenAvatar;
 
     public UserDTO(Usuario usuario) {
         this.id = usuario.getUsuarioId();
         this.username = usuario.getUsername();
         this.email = usuario.getEmail();
         this.nomeCompleto = usuario.getNomeCompleto();
-        this.chosenAvatar = usuario.getChosenAvatar();
     }
 }

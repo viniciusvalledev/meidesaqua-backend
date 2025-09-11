@@ -22,8 +22,9 @@ public class Usuario implements UserDetails {
     @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
-    @Column(name = "chosen_avatar")
-    private String chosenAvatar;
+    // CAMPO REMOVIDO
+    // @Column(name = "chosen_avatar")
+    // private String chosenAvatar;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -41,7 +42,7 @@ public class Usuario implements UserDetails {
     private String confirmationToken;
 
     @Column(name = "enabled")
-    private boolean enabled = false; // Por padrão, a conta é criada como inativa
+    private boolean enabled = false;
 
     @Column(name = "reset_password_token_expiry")
     private LocalDateTime resetPasswordTokenExpiry;
@@ -62,7 +63,6 @@ public class Usuario implements UserDetails {
         return this.password;
     }
 
-    // Este metodo é usado pelo Spring Security e deve retornar o campo 'username'
     @Override
     public String getUsername() {
         return this.username;

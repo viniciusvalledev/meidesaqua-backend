@@ -55,7 +55,7 @@ public class AuthService implements UserDetailsService {
 
         String token = UUID.randomUUID().toString();
         usuario.setConfirmationToken(token);
-        usuario.setEnabled(false); // Garante que o utilizador comece como inativo
+        usuario.setEnabled(false);
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         emailService.sendConfirmationEmail(usuarioSalvo.getEmail(), usuarioSalvo.getConfirmationToken());
@@ -70,6 +70,18 @@ public class AuthService implements UserDetailsService {
 
         usuario.setEnabled(true);
         usuario.setConfirmationToken(null);
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void confirmEmailChange(String token) throws Exception {
+        Usuario usuario = usuarioRepository.findByEmailChangeToken(token)
+                .orElseThrow(() -> new Exception("Token de alteração de e-mail inválido ou não encontrado."));
+
+        usuario.setEmail(usuario.getUnconfirmedEmail());
+        usuario.setUnconfirmedEmail(null);
+        usuario.setEmailChangeToken(null);
+
         usuarioRepository.save(usuario);
     }
 
@@ -102,55 +114,31 @@ public class AuthService implements UserDetailsService {
         usuarioRepository.save(usuario);
     }
 
-    // --- METODO ATUALIZADO COM A NOVA LÓGICA ---
     @Transactional
     public Usuario updateUserProfile(String currentUsername, UpdateProfileRequest data) throws Exception {
         Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
                 .orElseThrow(() -> new Exception("Utilizador não encontrado."));
 
-        if (data.getNomeCompleto() != null && !data.getNomeCompleto().isEmpty()) {
+        if (data.getNomeCompleto() != null) {
             currentUser.setNomeCompleto(data.getNomeCompleto());
         }
-
-        // Lógica para username permanece a mesma
-        if (data.getUsername() != null && !data.getUsername().isEmpty() && !data.getUsername().equals(currentUser.getUsername())) {
-            if (usuarioRepository.findByUsername(data.getUsername()).isPresent()) {
-                throw new Exception("Este nome de usuário já está em uso.");
-            }
+        if (data.getUsername() != null) {
             currentUser.setUsername(data.getUsername());
         }
 
-        // --- NOVA LÓGICA PARA ALTERAÇÃO DE E-MAIL ---
-        if (data.getEmail() != null && !data.getEmail().isEmpty() && !data.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
+        if (data.getEmail() != null && !data.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
             if (usuarioRepository.findByEmail(data.getEmail()).isPresent()) {
-                throw new Exception("Este e-mail já está em uso por outra conta.");
+                throw new Exception("O novo e-mail já está em uso por outra conta.");
             }
 
             String token = UUID.randomUUID().toString();
-            currentUser.setUnconfirmedEmail(data.getEmail()); // Guarda o novo e-mail temporariamente
-            currentUser.setEmailChangeToken(token); // Guarda o token de alteração
+            currentUser.setUnconfirmedEmail(data.getEmail());
+            currentUser.setEmailChangeToken(token);
 
-            // Envia o e-mail de confirmação para o NOVO endereço
             emailService.sendEmailChangeConfirmationEmail(data.getEmail(), token);
         }
 
         return usuarioRepository.save(currentUser);
-    }
-
-    public Usuario updateUserAvatar(String currentUsername, String avatarFileName) throws Exception {
-        Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado."));
-        currentUser.setChosenAvatar(avatarFileName);
-        return usuarioRepository.save(currentUser);
-    }
-
-    @Transactional
-    public void deleteUser(String currentUsername) {
-        Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado: " + currentUsername));
-
-        avaliacaoRepository.deleteByUsuario(currentUser);
-        usuarioRepository.delete(currentUser);
     }
 
     @Transactional
@@ -168,16 +156,12 @@ public class AuthService implements UserDetailsService {
         usuarioRepository.save(currentUser);
     }
 
-    // --- METODO PARA CONFIRMAÇÃO DE EMAIL IMPLEMENTADO ---
     @Transactional
-    public void confirmEmailChange(String token) throws Exception {
-        Usuario usuario = usuarioRepository.findByEmailChangeToken(token)
-                .orElseThrow(() -> new Exception("Token de alteração de e-mail inválido ou não encontrado."));
+    public void deleteUser(String currentUsername) {
+        Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado: " + currentUsername));
 
-        usuario.setEmail(usuario.getUnconfirmedEmail());
-        usuario.setUnconfirmedEmail(null);
-        usuario.setEmailChangeToken(null);
-
-        usuarioRepository.save(usuario);
+        avaliacaoRepository.deleteByUsuario(currentUser);
+        usuarioRepository.delete(currentUser);
     }
 }
