@@ -1,6 +1,7 @@
 package com.meidesaqua.meidesaqua_backend.DTO;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class EstabelecimentoDTO {
@@ -16,6 +17,6 @@ public class EstabelecimentoDTO {
     private String instagram;
     private Boolean ativo;
     private String logoUrl;
-    private String produtosImg;
+    private List<String> produtosImg;
     private Double media; // A média será um número (Double)
 }

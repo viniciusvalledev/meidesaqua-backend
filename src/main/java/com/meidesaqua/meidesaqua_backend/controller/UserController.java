@@ -33,7 +33,6 @@ public class UserController {
     }
 
 
-
     // NOVO ENDPOINT PARA EXCLUSÃO DE PERFIL
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteUserProfile(Authentication authentication) {
@@ -42,6 +41,17 @@ public class UserController {
             String username = authentication.getName();
             authService.deleteUser(username);
             return ResponseEntity.ok("Perfil de utilizador excluído com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<?> updateUserPassword(@RequestBody UpdatePasswordRequest passwordRequest, Authentication authentication) {
+        try {
+            String username = authentication.getName();
+            authService.updateUserPassword(username, passwordRequest);
+            return ResponseEntity.ok("Senha alterada com sucesso.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

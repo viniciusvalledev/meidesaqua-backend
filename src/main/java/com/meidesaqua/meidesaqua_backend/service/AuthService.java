@@ -133,4 +133,18 @@ public class AuthService implements UserDetailsService {
         avaliacaoRepository.deleteByUsuario(currentUser);
         usuarioRepository.delete(currentUser);
     }
+    @Transactional
+    public void updateUserPassword(String username, UpdatePasswordRequest request) throws Exception {
+        Usuario currentUser = usuarioRepository.findByEmailOrUsername(username, username)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado."));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
+            throw new Exception("A senha atual está incorreta.");
+        }
+
+        String novaSenhaCriptografada = passwordEncoder.encode(request.getNewPassword());
+        currentUser.setPassword(novaSenhaCriptografada);
+
+        usuarioRepository.save(currentUser);
+    }
 }

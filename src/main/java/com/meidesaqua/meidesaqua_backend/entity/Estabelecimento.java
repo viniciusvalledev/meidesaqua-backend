@@ -2,6 +2,7 @@ package com.meidesaqua.meidesaqua_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Entity
 @Table(name = "estabelecimentos")
@@ -33,8 +34,8 @@ public class Estabelecimento {
     private Boolean ativo;
     @Column(name = "logoUrl", columnDefinition = "TEXT")
     private String logoUrl;
-    @Column(name = "produtosImg", columnDefinition = "TEXT")
-    private String produtosImg;
+    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImagemProduto> produtosImg;
 
     // Mapeamento direto das colunas para os atributos
 }

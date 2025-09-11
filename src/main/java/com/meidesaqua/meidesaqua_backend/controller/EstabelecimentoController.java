@@ -4,15 +4,13 @@ import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.service.AvaliacaoService;
 import com.meidesaqua.meidesaqua_backend.service.EstabelecimentoService;
-
-// IMPORTS PARA LOG
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +22,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/estabelecimentos")
 public class EstabelecimentoController {
 
-    // ADICIONAR UM LOGGER PARA DEPURAR
     private static final Logger logger = LoggerFactory.getLogger(EstabelecimentoController.class);
 
     @Autowired
@@ -33,12 +30,19 @@ public class EstabelecimentoController {
     @Autowired
     private AvaliacaoService avaliacaoService;
 
-    @PostMapping
-    public ResponseEntity<?> cadastrarEstabelecimento(@RequestBody Estabelecimento estabelecimento) {
+    // --- METODO DE CADASTRO ATUALIZADO PARA RECEBER IMAGENS E DADOS JUNTOS ---
+    @PostMapping(consumes = { "multipart/form-data" })
+    public ResponseEntity<?> cadastrarEstabelecimentoComImagens(
+            @RequestPart("estabelecimento") Estabelecimento estabelecimento,
+            @RequestPart(value = "logoFile", required = false) MultipartFile logoFile,
+            @RequestPart(value = "produtosImgFiles", required = false) List<MultipartFile> produtosImgFiles
+    ) {
         try {
-            Estabelecimento novoEstabelecimento = estabelecimentoService.cadastrarEstabelecimento(estabelecimento);
+            Estabelecimento novoEstabelecimento = estabelecimentoService.cadastrarEstabelecimentoComImagens(estabelecimento, logoFile, produtosImgFiles);
             return new ResponseEntity<>(novoEstabelecimento, HttpStatus.CREATED);
         } catch (Exception e) {
+            // Imprime o erro no console do backend para facilitar a depuração
+            logger.error("Falha ao cadastrar estabelecimento com imagens", e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -61,7 +65,6 @@ public class EstabelecimentoController {
         return ResponseEntity.ok(dtos);
     }
 
-    // MÉTODO MODIFICADO PARA DEPURAR O ERRO 500
     @GetMapping("/{id}")
     public ResponseEntity<EstabelecimentoDTO> buscarPorId(@PathVariable Integer id) {
         logger.info(">>> Buscando estabelecimento com ID: {}", id);
@@ -82,7 +85,6 @@ public class EstabelecimentoController {
             return ResponseEntity.ok(dto);
 
         } catch (Exception e) {
-            // SE ALGO FALHAR, ESTE BLOCO VAI CAPTURAR E IMPRIMIR O ERRO COMPLETO
             logger.error("!!!!!! ERRO GRAVE AO PROCESSAR ESTABELECIMENTO ID: {} !!!!!!", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
