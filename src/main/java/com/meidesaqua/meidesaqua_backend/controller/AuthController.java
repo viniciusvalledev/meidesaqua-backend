@@ -66,10 +66,11 @@ public class AuthController {
     public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String token) {
         try {
             authService.confirmUserAccount(token);
-            // Idealmente, esta resposta redirecionaria para uma página do frontend
-            return ResponseEntity.ok("Conta ativada com sucesso. Você já pode fazer login.");
+            // CORREÇÃO: Retorna uma resposta JSON para sucesso
+            return ResponseEntity.ok(Collections.singletonMap("message", "Conta ativada com sucesso. Você já pode fazer login."));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // BOA PRÁTICA: Retorna uma resposta JSON para erro
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
