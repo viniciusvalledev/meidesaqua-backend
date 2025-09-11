@@ -46,6 +46,12 @@ public class Usuario implements UserDetails {
     @Column(name = "reset_password_token_expiry")
     private LocalDateTime resetPasswordTokenExpiry;
 
+    @Column(name = "unconfirmed_email")
+    private String unconfirmedEmail;
+
+    @Column(name = "email_change_token")
+    private String emailChangeToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));

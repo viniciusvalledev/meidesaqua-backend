@@ -1,6 +1,7 @@
 package com.meidesaqua.meidesaqua_backend.controller;
 
 import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO;
+import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoRequestDTO; // IMPORTAR
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.service.AvaliacaoService;
 import com.meidesaqua.meidesaqua_backend.service.EstabelecimentoService;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,19 +30,14 @@ public class EstabelecimentoController {
     @Autowired
     private AvaliacaoService avaliacaoService;
 
-    // --- METODO DE CADASTRO ATUALIZADO PARA RECEBER IMAGENS E DADOS JUNTOS ---
-    @PostMapping(consumes = { "multipart/form-data" })
-    public ResponseEntity<?> cadastrarEstabelecimentoComImagens(
-            @RequestPart("estabelecimento") Estabelecimento estabelecimento,
-            @RequestPart(value = "logoFile", required = false) MultipartFile logoFile,
-            @RequestPart(value = "produtosImgFiles", required = false) List<MultipartFile> produtosImgFiles
-    ) {
+    // METODO DE CADASTRO VIA JSON
+    @PostMapping
+    public ResponseEntity<?> cadastrarEstabelecimentoJSON(@RequestBody EstabelecimentoRequestDTO requestDTO) {
         try {
-            Estabelecimento novoEstabelecimento = estabelecimentoService.cadastrarEstabelecimentoComImagens(estabelecimento, logoFile, produtosImgFiles);
+            Estabelecimento novoEstabelecimento = estabelecimentoService.cadastrarEstabelecimentoComImagensBase64(requestDTO);
             return new ResponseEntity<>(novoEstabelecimento, HttpStatus.CREATED);
         } catch (Exception e) {
-            // Imprime o erro no console do backend para facilitar a depuração
-            logger.error("Falha ao cadastrar estabelecimento com imagens", e);
+            logger.error("Falha ao cadastrar estabelecimento via JSON", e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -67,27 +62,18 @@ public class EstabelecimentoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EstabelecimentoDTO> buscarPorId(@PathVariable Integer id) {
-        logger.info(">>> Buscando estabelecimento com ID: {}", id);
-        try {
-            Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoService.buscarPorId(id);
+        return estabelecimentoService.buscarPorId(id)
+                .map(estabelecimentoService::convertToDto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-            if (estabelecimentoOpt.isEmpty()) {
-                logger.warn(">>> Estabelecimento com ID: {} não encontrado.", id);
-                return ResponseEntity.notFound().build();
-            }
-
-            Estabelecimento estabelecimento = estabelecimentoOpt.get();
-            logger.info(">>> Estabelecimento encontrado: {}", estabelecimento.getNomeFantasia());
-
-            EstabelecimentoDTO dto = estabelecimentoService.convertToDto(estabelecimento);
-            logger.info(">>> DTO convertido com sucesso para o estabelecimento ID: {}", id);
-
-            return ResponseEntity.ok(dto);
-
-        } catch (Exception e) {
-            logger.error("!!!!!! ERRO GRAVE AO PROCESSAR ESTABELECIMENTO ID: {} !!!!!!", id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @GetMapping("/nome/{nomeFantasia}")
+    public ResponseEntity<EstabelecimentoDTO> buscarPorNomeFantasia(@PathVariable String nomeFantasia) {
+        return estabelecimentoService.buscarPorNomeFantasia(nomeFantasia)
+                .map(estabelecimentoService::convertToDto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/media")

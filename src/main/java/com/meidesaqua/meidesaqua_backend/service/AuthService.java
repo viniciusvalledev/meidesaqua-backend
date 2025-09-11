@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,12 +55,10 @@ public class AuthService implements UserDetailsService {
 
         String token = UUID.randomUUID().toString();
         usuario.setConfirmationToken(token);
+        usuario.setEnabled(false); // Garante que o utilizador comece como inativo
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
         emailService.sendConfirmationEmail(usuarioSalvo.getEmail(), usuarioSalvo.getConfirmationToken());
-
-        System.out.println("TOKEN DE CONFIRMAÇÃO: " + usuarioSalvo.getConfirmationToken());
 
         return usuarioSalvo;
     }
@@ -103,24 +102,44 @@ public class AuthService implements UserDetailsService {
         usuarioRepository.save(usuario);
     }
 
+    // --- METODO ATUALIZADO COM A NOVA LÓGICA ---
+    @Transactional
     public Usuario updateUserProfile(String currentUsername, UpdateProfileRequest data) throws Exception {
         Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
                 .orElseThrow(() -> new Exception("Utilizador não encontrado."));
-        if (data.getNomeCompleto() != null) {
+
+        if (data.getNomeCompleto() != null && !data.getNomeCompleto().isEmpty()) {
             currentUser.setNomeCompleto(data.getNomeCompleto());
         }
-        if (data.getEmail() != null) {
-            currentUser.setEmail(data.getEmail());
-        }
-        if (data.getUsername() != null) {
+
+        // Lógica para username permanece a mesma
+        if (data.getUsername() != null && !data.getUsername().isEmpty() && !data.getUsername().equals(currentUser.getUsername())) {
+            if (usuarioRepository.findByUsername(data.getUsername()).isPresent()) {
+                throw new Exception("Este nome de usuário já está em uso.");
+            }
             currentUser.setUsername(data.getUsername());
         }
+
+        // --- NOVA LÓGICA PARA ALTERAÇÃO DE E-MAIL ---
+        if (data.getEmail() != null && !data.getEmail().isEmpty() && !data.getEmail().equalsIgnoreCase(currentUser.getEmail())) {
+            if (usuarioRepository.findByEmail(data.getEmail()).isPresent()) {
+                throw new Exception("Este e-mail já está em uso por outra conta.");
+            }
+
+            String token = UUID.randomUUID().toString();
+            currentUser.setUnconfirmedEmail(data.getEmail()); // Guarda o novo e-mail temporariamente
+            currentUser.setEmailChangeToken(token); // Guarda o token de alteração
+
+            // Envia o e-mail de confirmação para o NOVO endereço
+            emailService.sendEmailChangeConfirmationEmail(data.getEmail(), token);
+        }
+
         return usuarioRepository.save(currentUser);
     }
 
-
     public Usuario updateUserAvatar(String currentUsername, String avatarFileName) throws Exception {
-        Usuario currentUser = (Usuario) this.loadUserByUsername(currentUsername);
+        Usuario currentUser = usuarioRepository.findByEmailOrUsername(currentUsername, currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado."));
         currentUser.setChosenAvatar(avatarFileName);
         return usuarioRepository.save(currentUser);
     }
@@ -133,6 +152,7 @@ public class AuthService implements UserDetailsService {
         avaliacaoRepository.deleteByUsuario(currentUser);
         usuarioRepository.delete(currentUser);
     }
+
     @Transactional
     public void updateUserPassword(String username, UpdatePasswordRequest request) throws Exception {
         Usuario currentUser = usuarioRepository.findByEmailOrUsername(username, username)
@@ -146,5 +166,18 @@ public class AuthService implements UserDetailsService {
         currentUser.setPassword(novaSenhaCriptografada);
 
         usuarioRepository.save(currentUser);
+    }
+
+    // --- METODO PARA CONFIRMAÇÃO DE EMAIL IMPLEMENTADO ---
+    @Transactional
+    public void confirmEmailChange(String token) throws Exception {
+        Usuario usuario = usuarioRepository.findByEmailChangeToken(token)
+                .orElseThrow(() -> new Exception("Token de alteração de e-mail inválido ou não encontrado."));
+
+        usuario.setEmail(usuario.getUnconfirmedEmail());
+        usuario.setUnconfirmedEmail(null);
+        usuario.setEmailChangeToken(null);
+
+        usuarioRepository.save(usuario);
     }
 }

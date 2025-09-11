@@ -6,8 +6,9 @@ import com.meidesaqua.meidesaqua_backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections; // Importe a classe Collections
 
 @RestController
 @RequestMapping("/api/users")
@@ -16,33 +17,28 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
-    // O PasswordEncoder foi removido pois não é mais usado neste controller
-    // @Autowired
-    // private PasswordEncoder passwordEncoder;
-
-    // Endpoint: PUT /api/users/profile
     @PostMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody UpdateProfileRequest profileRequest, Authentication authentication) {
         try {
-            // O 'authentication.getName()' pega o username do utilizador logado a partir do token JWT
             Usuario updatedUser = authService.updateUserProfile(authentication.getName(), profileRequest);
-            return ResponseEntity.ok(updatedUser);
+            // Retorna o DTO do usuário para não expor a senha
+            return ResponseEntity.ok(new UserDTO(updatedUser));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Retorna um objeto JSON com a mensagem de erro
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
-
-    // NOVO ENDPOINT PARA EXCLUSÃO DE PERFIL
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteUserProfile(Authentication authentication) {
         try {
-            // Pega o nome de utilizador a partir do token de autenticação
             String username = authentication.getName();
             authService.deleteUser(username);
-            return ResponseEntity.ok("Perfil de utilizador excluído com sucesso.");
+            // Retorna um objeto JSON com a mensagem de sucesso
+            return ResponseEntity.ok(Collections.singletonMap("message", "Perfil de utilizador excluído com sucesso."));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Retorna um objeto JSON com la mensagem de erro
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
@@ -51,9 +47,11 @@ public class UserController {
         try {
             String username = authentication.getName();
             authService.updateUserPassword(username, passwordRequest);
-            return ResponseEntity.ok("Senha alterada com sucesso.");
+            // Retorna um objeto JSON com a mensagem de sucesso
+            return ResponseEntity.ok(Collections.singletonMap("message", "Senha alterada com sucesso."));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Retorna um objeto JSON com a mensagem de erro
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 }

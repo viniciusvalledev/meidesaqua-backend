@@ -18,4 +18,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     // Metodo para enviar o token de confirmação
     Optional<Usuario> findByConfirmationToken(String confirmationToken);
 
+    // Metodo para token de confirmação para troca de e-mail
+    Optional<Usuario> findByEmailChangeToken(String token);
+
+    Optional<Usuario> findByUsername(String username);
 }

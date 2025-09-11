@@ -35,4 +35,19 @@ public class EmailService {
                 + "Se você não solicitou esta alteração, por favor ignore este e-mail.");
         mailSender.send(message);
     }
+    // Metodo para enviar email quando for alterar o e-mail
+    public void sendEmailChangeConfirmationEmail(String to, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Confirmação de Alteração de E-mail - Meidesaqua");
+
+        String confirmationUrl = "http://localhost:3000/confirmar-novo-email?token=" + token;
+
+        message.setText("Recebemos um pedido para alterar o e-mail da sua conta para este endereço.\n\n"
+                + "Por favor, clique no link abaixo para confirmar a alteração:\n"
+                + confirmationUrl + "\n\n"
+                + "Se você não solicitou esta alteração, por favor ignore este e-mail.");
+
+        mailSender.send(message);
+    }
 }

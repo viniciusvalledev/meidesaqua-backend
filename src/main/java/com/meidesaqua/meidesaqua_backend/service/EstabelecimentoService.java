@@ -1,13 +1,13 @@
 package com.meidesaqua.meidesaqua_backend.service;
 
 import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoDTO;
+import com.meidesaqua.meidesaqua_backend.DTO.EstabelecimentoRequestDTO;
 import com.meidesaqua.meidesaqua_backend.entity.Estabelecimento;
 import com.meidesaqua.meidesaqua_backend.entity.ImagemProduto;
 import com.meidesaqua.meidesaqua_backend.repository.EstabelecimentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,36 +23,32 @@ public class EstabelecimentoService {
     @Autowired
     private AvaliacaoService avaliacaoService;
 
-    // Assumindo que você tem o FileStorageService que criámos anteriormente
     @Autowired
     private FileStorageService fileStorageService;
 
-    // --- METODO DE SERVIÇO ATUALIZADO PARA LIDAR COM IMAGENS E DADOS JUNTOS ---
+    // --- METODO CORRIGIDO ---
     @Transactional
-    public Estabelecimento cadastrarEstabelecimentoComImagens(
-            Estabelecimento estabelecimento,
-            MultipartFile logoFile,
-            List<MultipartFile> produtosImgFiles
-    ) throws Exception {
+    public Estabelecimento cadastrarEstabelecimentoComImagensBase64(EstabelecimentoRequestDTO dto) throws Exception {
 
-        if (estabelecimento.getCnpj() != null && estabelecimentoRepository.findByCnpj(estabelecimento.getCnpj()).isPresent()) {
+        if (dto.getCnpj() != null && !dto.getCnpj().isEmpty() && estabelecimentoRepository.findByCnpj(dto.getCnpj()).isPresent()) {
             throw new Exception("CNPJ já cadastrado no sistema.");
         }
 
+        // Converte os dados de texto do DTO para a entidade
+        Estabelecimento estabelecimento = dto.toEntity();
+
         // 1. Salva a imagem da logo, se ela foi enviada
-        if (logoFile != null && !logoFile.isEmpty()) {
-            String logoUrl = fileStorageService.save(logoFile);
+        if (dto.getLogoBase64() != null && !dto.getLogoBase64().isEmpty()) {
+            String logoUrl = fileStorageService.saveBase64(dto.getLogoBase64());
             estabelecimento.setLogoUrl(logoUrl);
         }
 
         // 2. Salva as imagens do carrossel, se elas foram enviadas
-        if (produtosImgFiles != null && !produtosImgFiles.isEmpty()) {
+        if (dto.getProdutosImgBase64() != null && !dto.getProdutosImgBase64().isEmpty()) {
             List<ImagemProduto> imagens = new ArrayList<>();
-            for (MultipartFile file : produtosImgFiles) {
-                if (!file.isEmpty()) {
-                    String imgUrl = fileStorageService.save(file);
-                    imagens.add(new ImagemProduto(imgUrl, estabelecimento));
-                }
+            for (String base64Image : dto.getProdutosImgBase64()) {
+                String imgUrl = fileStorageService.saveBase64(base64Image);
+                imagens.add(new ImagemProduto(imgUrl, estabelecimento));
             }
             estabelecimento.setProdutosImg(imagens);
         }
@@ -73,16 +69,16 @@ public class EstabelecimentoService {
         return estabelecimentoRepository.findByNomeFantasiaContainingIgnoreCase(nome);
     }
 
+    public Optional<Estabelecimento> buscarPorNomeFantasia(String nome) {
+        return estabelecimentoRepository.findByNomeFantasia(nome);
+    }
+
     public Estabelecimento alterarStatusAtivo(Integer id, boolean novoStatus) throws Exception {
         Estabelecimento estabelecimento = estabelecimentoRepository.findById(id)
                 .orElseThrow(() -> new Exception("Estabelecimento não encontrado com o ID: " + id));
 
         estabelecimento.setAtivo(novoStatus);
         return estabelecimentoRepository.save(estabelecimento);
-    }
-
-    public Optional<Estabelecimento> buscarPorNomeFantasia(String nome) {
-        return estabelecimentoRepository.findByNomeFantasia(nome);
     }
 
     public EstabelecimentoDTO convertToDto(Estabelecimento estabelecimento) {
@@ -101,7 +97,6 @@ public class EstabelecimentoService {
         dto.setAtivo(estabelecimento.getAtivo());
         dto.setLogoUrl(estabelecimento.getLogoUrl());
 
-        // Converte a lista de entidades de imagem para uma lista de strings (URLs)
         if (estabelecimento.getProdutosImg() != null) {
             List<String> urls = estabelecimento.getProdutosImg().stream()
                     .map(ImagemProduto::getUrl)

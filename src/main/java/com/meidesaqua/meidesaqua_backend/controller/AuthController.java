@@ -95,4 +95,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // NOVO ENDPOINT
+    @GetMapping("/confirm-email-change")
+    public ResponseEntity<?> confirmEmailChange(@RequestParam("token") String token) {
+        try {
+            authService.confirmEmailChange(token);
+            return ResponseEntity.ok("Alteração de e-mail confirmada com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
