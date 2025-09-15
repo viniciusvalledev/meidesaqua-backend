@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.meidesaqua.meidesaqua_backend.exception.EmailAlreadyExistsException;
+import com.meidesaqua.meidesaqua_backend.exception.UsernameAlreadyExistsException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,16 +41,25 @@ public class AuthService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return usuarioRepository.findByEmailOrUsername(username, username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilizador não encontrado: " + username));
+
+
     }
 
     @Transactional
     public Usuario cadastrarUsuario(Usuario usuario, PasswordEncoder passwordEncoder) throws Exception {
-        if (usuarioRepository.findByEmailOrUsername(usuario.getEmail(), usuario.getUsername()).isPresent()) {
-            throw new Exception("Email ou nome de utilizador já cadastrado.");
+        if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
+            throw new UsernameAlreadyExistsException("Usuário já cadastrado, use outro e tente novamente.");
         }
+
+        // ALTERAÇÃO AQUI: Verifica o e-mail
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email já cadastrado, use outro e tente novamente.");
+        }
+
         if (profanityFilterService.contemPalavrao(usuario.getUsername())) {
             throw new Exception("O nome de utilizador contém palavras impróprias.");
         }
+
 
         String senhaCriptografada = passwordEncoder.encode(usuario.getPassword());
         usuario.setPassword(senhaCriptografada);
