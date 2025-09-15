@@ -30,9 +30,15 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Redefinição de Senha - Meidesaqua");
-        message.setText("Para redefinir sua senha, use o seguinte token na nossa página de redefinição.\n\n"
-                + "Seu token é: " + token + "\n\n"
+
+        // Altere "http://localhost:3000" para o endereço do seu frontend
+        String resetUrl = "http://localhost:3000/redefinir-senha?token=" + token;
+
+        message.setText("Recebemos um pedido para redefinir a senha da sua conta.\n\n"
+                + "Por favor, clique no link abaixo para criar uma nova senha:\n"
+                + resetUrl + "\n\n"
                 + "Se você não solicitou esta alteração, por favor ignore este e-mail.");
+
         mailSender.send(message);
     }
     // Metodo para enviar email quando for alterar o e-mail
