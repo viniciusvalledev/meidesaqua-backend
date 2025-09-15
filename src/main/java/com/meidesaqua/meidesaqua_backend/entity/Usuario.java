@@ -22,10 +22,6 @@ public class Usuario implements UserDetails {
     @Column(name = "nome_completo_user", nullable = false)
     private String nomeCompleto;
 
-    // CAMPO REMOVIDO
-    // @Column(name = "chosen_avatar")
-    // private String chosenAvatar;
-
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
