@@ -105,9 +105,15 @@ public class AuthController {
     public ResponseEntity<?> confirmEmailChange(@RequestParam("token") String token) {
         try {
             authService.confirmEmailChange(token);
-            return ResponseEntity.ok("Alteração de e-mail confirmada com sucesso.");
+            // CORREÇÃO: Retornar uma resposta JSON
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Alteração de e-mail confirmada com sucesso.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // CORREÇÃO: Retornar uma resposta JSON para o erro também
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 }

@@ -91,6 +91,7 @@ public class AuthService implements UserDetailsService {
 
         usuario.setEmail(usuario.getUnconfirmedEmail());
         usuario.setUnconfirmedEmail(null);
+        // CORREÇÃO: Limpa o token para que ele não possa ser reutilizado
         usuario.setEmailChangeToken(null);
 
         usuarioRepository.save(usuario);
