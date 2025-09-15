@@ -1,3 +1,5 @@
+// meidesaqua-backend/src/main/java/com/meidesaqua/meidesaqua_backend/exception/GlobalExceptionHandler.java
+
 package com.meidesaqua.meidesaqua_backend.exception;
 
 import org.springframework.http.HttpStatus;
@@ -12,27 +14,27 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // --- CORREÇÃO AQUI ---
-    // A resposta agora é um objeto Map que será convertido para JSON
+    // --- ALTERAÇÃO AQUI ---
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<Object> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
+        body.put("message", ex.getMessage()); // Coloca a mensagem da exceção dentro do JSON
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    // --- CORREÇÃO AQUI ---
+    // --- ALTERAÇÃO AQUI ---
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<Object> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
+        body.put("message", ex.getMessage()); // Coloca a mensagem da exceção dentro do JSON
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    // (Opcional, mas recomendado) Ajuste o handler genérico também
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(Exception ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
-        body.put("message", "Ocorreu um erro inesperado.");
+        body.put("message", "Ocorreu um erro inesperado: " + ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

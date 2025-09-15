@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -35,15 +36,15 @@ public class AuthController {
     // ----- A ÚNICA ALTERAÇÃO NECESSÁRIA É AQUI -----
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) throws Exception {
-        // 1. O 'try-catch' foi removido daqui.
-        // 2. 'throws Exception' foi adicionado na assinatura do método.
-        // Isso permite que as exceções (EmailAlreadyExists, etc.)
-        // cheguem ao GlobalExceptionHandler para serem formatadas como JSON.
         authService.cadastrarUsuario(usuario, passwordEncoder);
-        return new ResponseEntity<>("Cadastro realizado com sucesso! Por favor, verifique seu e-mail para ativar sua conta.", HttpStatus.CREATED);
-    }
-    // ----- FIM DA ALTERAÇÃO -----
 
+        // --- ALTERAÇÃO AQUI ---
+        // Agora, a resposta de sucesso também é um JSON.
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Cadastro realizado com sucesso! Por favor, verifique seu e-mail para ativar sua conta.");
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
