@@ -35,12 +35,23 @@ public class ProfanityFilterService {
             "tomarnocu", "otario", "otaria", "cretino", "cretina", "vigarista", "pilantra", "escroto", "escrota",
             "ridiculo", "ridicula", "nojento", "nojenta", "lixo", "verme",
 // ABREVIAÇÕES E GÍRIAS
-            "prr", "krlh", "mlk", "sfd", "slc", "pprt",
+            "prr", "krlh", "mlk", "sfd", "slc", "pprt", "vtc", "vtmnc",
+            "fdc", "tmnc", "mrd", "tmr", "vtnc", "vtmn", "nfd", "pqpp", "fpa", "crlh", "crl",
+            "kcete", "bglh", "bct", "bctx", "vx", "xot4", "xoxota", "fod4", "fodase", "fud3", "fud3u",
+            "f0d4", "f0d@s3", "vag4", "p1ca", "c0c0", "b0st@",
 // VARIAÇÕES COM NÚMEROS (LEETSPEAK)
             "p0rra", "p0ha", "f0der", "fud3r", "fod3r", "crlh0", "c4ralho", "arromb4do", "b0ceta", "viad0",
-            "put0", "merd4", "cuz4o", "b0sta", "vag4bundo", "vag4bunda"
-
+            "put0", "merd4", "cuz4o", "b0sta", "vag4bundo", "vag4bunda",
+// PALAVRÕES ADICIONAIS
+            "abestado", "anta", "asinina", "asinino", "babona", "burraldo", "bundinha", "corno manso",
+            "debiloide", "demoniado", "desgraçado", "desgraçada", "estrupício", "escarrado", "estrume",
+            "esporrada", "esporro", "estoura-toba", "fela", "feladaputa", "filha da mãe", "filho de uma égua",
+            "franga", "frango", "idiotona", "jegue", "jumento", "lambedor", "maria chuteira", "maria gasolina",
+            "maria mijona", "merdel", "merdeiro", "panaca", "pangaré", "pau no cu", "pau no seu", "pauzudo",
+            "peidorreiro", "porcaria", "pústula", "rabeta", "ralé", "safada", "safado", "sem noção", "sem vergonha",
+            "tapado", "tapada", "traste", "urubu", "vagaba", "vagabundagem", "veaca", "zé buceta", "zé ruela", "zé povinho"
     );
+
 
     /**
      * Verifica se o texto contém palavras proibidas após normalizá-lo.
