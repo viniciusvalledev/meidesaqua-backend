@@ -1,4 +1,3 @@
-
 package com.meidesaqua.meidesaqua_backend.controller;
 
 import com.meidesaqua.meidesaqua_backend.DTO.AvaliacaoDTO;
@@ -12,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -29,7 +29,11 @@ public class AvaliacaoController {
             Avaliacao novaAvaliacao = avaliacaoService.submeterAvaliacao(avaliacao, usuarioLogado);
             return new ResponseEntity<>(novaAvaliacao, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            // --- ALTERAÇÃO AQUI ---
+            // Retorna um mapa (que será convertido para JSON) com a mensagem de erro
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
@@ -44,7 +48,10 @@ public class AvaliacaoController {
         } catch (AccessDeniedException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 
