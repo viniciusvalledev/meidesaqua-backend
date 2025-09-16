@@ -41,7 +41,7 @@ public class AvaliacaoService {
 
         // Validação 3: Filtro de palavrões no comentário
         if (profanityFilterService.contemPalavrao(avaliacao.getComentario())) {
-            throw new IllegalArgumentException("O seu comentário contém palavras impróprias.");
+            throw new IllegalArgumentException("Você utilizou palavras inapropriadas.");
         }
 
         Integer estabelecimentoId = avaliacao.getEstabelecimento().getEstabelecimentoId();
@@ -72,7 +72,7 @@ public class AvaliacaoService {
         if (dadosAvaliacao.getComentario() != null) {
             // Filtro de palavrões na atualização
             if(profanityFilterService.contemPalavrao(dadosAvaliacao.getComentario())) {
-                throw new IllegalArgumentException("O seu comentário contém palavras impróprias.");
+                throw new IllegalArgumentException("Você utilizou palavras inapropriadas.");
             }
             avaliacaoExistente.setComentario(dadosAvaliacao.getComentario());
         }

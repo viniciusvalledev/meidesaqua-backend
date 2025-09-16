@@ -47,6 +47,9 @@ public class AuthService implements UserDetailsService {
 
     @Transactional
     public Usuario cadastrarUsuario(Usuario usuario, PasswordEncoder passwordEncoder) throws Exception {
+        if (profanityFilterService.contemPalavrao(usuario.getUsername())) {
+            throw new Exception("Você utilizou palavras inapropriadas.");
+        }
         if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("Usuário já cadastrado, use outro e tente novamente.");
         }
@@ -135,6 +138,9 @@ public class AuthService implements UserDetailsService {
             currentUser.setNomeCompleto(data.getNomeCompleto());
         }
         if (data.getUsername() != null) {
+            if (profanityFilterService.contemPalavrao(data.getUsername())) {
+                throw new Exception("Você utilizou palavras inapropriadas.");
+            }
             currentUser.setUsername(data.getUsername());
         }
 
